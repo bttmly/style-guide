@@ -158,7 +158,7 @@ var Person = (function() {
     this.name = name;
   }
 
-  Person.prototype.work = function() {
+  Person.prototype.walk = function() {
     // awesome method code
   };
 
@@ -182,6 +182,13 @@ var Child = (function( _super ) {
     // awesome method code
   };
 
+  Child.prototype.work = function() {
+    // call "super" like so
+    _super.prototype.work.call( this );
+
+    // more code
+  }
+
   return Child;
 
 })( Person );
@@ -190,13 +197,12 @@ var Child = (function( _super ) {
 When it becomes possible, or if you're compiling ES6 code to ES5, go ahead and use the new `class` syntax.
 
 ## Iteration
-Totally optional.
-
 Prefer `Array.prototype` methods over everything else! Use a polyfill for `Object.keys` if you need it. Yes, `forEach` and friends are somewhat slower than a `for` loop, but don't prematurely optimize. Plus, you get closure scope for free with the `Array.prototype` iterators, which can come in handy.
 
 ```javascript
 // bad
-for ( var i = 0; i < arr.length; i++ ) {
+var i;
+for ( i = 0; i < arr.length; i++ ) {
   // code
 }
 
@@ -216,3 +222,69 @@ Object.keys( obj ).forEach( function( key ) {
   // code
 });
 ```
+
+When you can't use an `Array.prototype` method, prefer `while` over `for`. Exactly what is happening and where is more clear with a `while` loop. If you _do_ use a `for` loop, for the love of God, keep it simple. There aren't any ribbons for coming up with clever conditions that trim off a line or two of code. When debugging, you often just skip over the opening of a `for` loop assuming it does what you expect. Sticking tricky conditions in the middle of three statements on a single line is asking for trouble. Incidentally, this is another reason to prefer `while` loops. The condition isn't trapped between other statements, it's sitting right there next to `while`, making it easier to identify. Also (I think) developers are less likely to skim over a `while` loop's condition assuming it does something.
+
+```javascript
+var people = [{ name: John Doe, age: 30 }, ... /* more people */ ];
+
+var i;
+var person;
+
+// best
+i = 0;
+while ( i < people.length ) {
+  person = people[i];
+  // etc...
+  i += 1;
+}
+
+// meh
+for ( i = 0; i < people.length; i++ ) {
+  person = people[i];
+  // etc...
+}
+
+// NO!
+for ( i = 0; person = people[i]; i++ ) {
+  // etc...
+}
+```
+
+## Modules and Design Patterns
+
+1. Things you're exporting from a module should be grouped in a single place.
+2. Use Browserify when you can. Or ES6 modules. Steer clear of module loaders (AMD).
+3. Use "revealing module pattern" if not using above.
+
+The easiest way to bring this all together is to basically stick to the same pattern:
+
+```
+// revealing module style
+
+var revealingModule = (function() {
+  var superCoolObj;
+  var someFunc = function(){};
+  // other code
+  superCoolObj = generateCoolObj();
+
+  return {
+    someFunc: someFunc,
+    superCoolObj: superCoolObj
+  };
+})();
+
+// export style
+
+var superCoolObj;
+var someFunc = function(){};
+// other code
+superCoolObj = generateCoolObj();
+
+module.exports = {
+  someFunc: someFunc,
+  superCoolObj: superCoolObj
+};
+```
+
+This makes it easy to see what is exported, as there's only one place to look. There are a lot of ways to mess this up. Generally, just pick a style that makes identifying exports as easy as possible.
