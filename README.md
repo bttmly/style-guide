@@ -259,7 +259,7 @@ for ( i = 0; person = people[i]; i++ ) {
 
 The easiest way to bring this all together is to basically stick to the same pattern:
 
-```
+```javascript
 // revealing module style
 
 var revealingModule = (function() {
