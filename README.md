@@ -1,3 +1,6 @@
+# Style Guide
+[My style](https://www.youtube.com/watch?v=4a_ovHALmbg).
+
 ## Punctuation, Spacing, Linebreaks
 
 Too little spacing makes code cramped and claustrophobic.
